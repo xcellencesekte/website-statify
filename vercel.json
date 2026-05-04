@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/homepage_desktop/index.html" },
+    { "source": "/guidelines", "destination": "/guidelines_desktop/index.html" },
+    { "source": "/kontak", "destination": "/kontak_desktop/index.html" },
+    { "source": "/layanan", "destination": "/layanan_biaya_desktop/index.html" }
+  ]
+}
