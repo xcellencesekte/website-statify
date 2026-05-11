@@ -107,6 +107,7 @@
     body {
       background-color: #f7f9fb;
       color: #191c1e;
+      overflow-x: hidden;
     }
     .bento-grid {
       display: grid;
@@ -114,7 +115,40 @@
       gap: 24px;
     }
 
-    /* Slider styles */
+    /* ── Scroll Reveal ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    @media (min-width: 768px) {
+      .reveal.reveal-left  { transform: translateX(-40px); }
+      .reveal.reveal-right { transform: translateX(40px); }
+    }
+    .reveal.reveal-scale {
+      transform: scale(0.94);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+    .reveal-stagger > * {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0.05s; }
+    .reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.15s; }
+    .reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.25s; }
+    .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.35s; }
+    .reveal-stagger.visible > * {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ── Slider styles ── */
     .slider-wrapper {
       position: relative;
       width: 100%;
@@ -175,62 +209,184 @@
     .slider-wrapper:hover .slider-btn {
       opacity: 1;
     }
+    @media (hover: none) {
+      .slider-btn { opacity: 0.7; }
+    }
     .slider-btn:hover {
       background: #ffffff;
     }
     .slider-btn-prev { left: 12px; }
     .slider-btn-next { right: 12px; }
 
-    /* Drag cursor */
     .slider-wrapper { cursor: grab; }
     .slider-wrapper.dragging { cursor: grabbing; }
+
+    /* ── Marquee / Rolling Tools ── */
+    .marquee-outer {
+      overflow: hidden;
+      position: relative;
+      -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+    }
+    .marquee-track {
+      display: flex;
+      gap: 12px;
+      width: max-content;
+      animation: marquee-scroll 22s linear infinite;
+    }
+    @media (min-width: 640px) {
+      .marquee-track { gap: 24px; animation-duration: 28s; }
+    }
+    .marquee-track:hover {
+      animation-play-state: paused;
+    }
+    @keyframes marquee-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .marquee-item {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: #ffffff;
+      border: 1px solid #c6c6cd;
+      border-radius: 12px;
+      width: 90px;
+      transition: box-shadow 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    @media (min-width: 640px) {
+      .marquee-item { width: 110px; padding: 16px; gap: 12px; }
+    }
+    .marquee-item:hover {
+      box-shadow: 0 8px 24px rgba(0,0,0,0.10);
+      transform: translateY(-3px);
+    }
+    .marquee-item img {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+    }
+    @media (min-width: 640px) {
+      .marquee-item img { height: 40px; }
+    }
+    .marquee-item span {
+      font-size: 12px;
+      line-height: 14px;
+      letter-spacing: 0.05em;
+      font-weight: 500;
+      text-align: center;
+      color: #1e293b;
+    }
+
+    /* ── Mobile Menu ── */
+    #mobileMenu {
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+    }
+    #mobileMenu.open {
+      max-height: 400px;
+      opacity: 1;
+    }
+    #bar1, #bar2, #bar3 {
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
   </style>
 </head>
 <body class="font-body-md selection:bg-secondary-fixed selection:text-on-secondary-fixed">
 
+<!-- ── NAV ── -->
 <nav class="bg-white/95 dark:bg-slate-950/95 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 shadow-sm">
-  <div class="flex justify-between items-center w-full px-8 h-20 max-w-7xl mx-auto">
-    <a href="#" class="flex items-center gap-3">
-      <img src="../source/logo.png" alt="Statify" class="h-32 w-auto object-contain"/>
-      <span class="text-2xl font-black tracking-tighter text-slate-900 dark:text-white hidden">Statify</span>
+  <div class="flex justify-between items-center w-full px-4 md:px-8 h-16 md:h-20 max-w-7xl mx-auto">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2 min-w-0">
+      <img src="../source/logo.png" alt="Statify" class="h-20 md:h-32 w-auto object-contain flex-shrink-0"/>
     </a>
+
+    <!-- Desktop nav links -->
     <div class="hidden md:flex items-center gap-8 font-manrope text-sm font-semibold tracking-tight">
       <a class="text-slate-900 dark:text-white border-b-2 border-slate-900 dark:border-white pb-1" href="../homepage_desktop/index.html">Home</a>
       <a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="../guidelines_desktop/index.html">Guidelines</a>
       <a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="../layanan_biaya_desktop/index.html">Layanan &amp; Biaya</a>
       <a class="text-slate-500 dark:text-slate-400 font-medium hover:text-slate-900 dark:hover:text-slate-200 transition-colors" href="../kontak_desktop/index.html">Kontak</a>
     </div>
-    <a href="https://docs.google.com/forms/d/e/1FAIpQLScTGQ4U348geWzZTMVluSYOjl6X_DPiG_EQVkS_xFrVJbFqxw/viewform" class="bg-primary text-on-primary px-6 py-2.5 rounded font-manrope text-sm font-bold tracking-tight hover:opacity-90 active:scale-95 transition-all block text-center no-underline">
-      Konsultasikan
-    </a>
+
+    <!-- Right side: CTA + hamburger -->
+    <div class="flex items-center gap-2">
+      <a href="https://docs.google.com/forms/d/e/1FAIpQLScTGQ4U348geWzZTMVluSYOjl6X_DPiG_EQVkS_xFrVJbFqxw/viewform"
+         class="bg-primary text-on-primary px-4 py-2 md:px-6 md:py-2.5 rounded font-manrope text-xs md:text-sm font-bold tracking-tight hover:opacity-90 active:scale-95 transition-all block text-center no-underline whitespace-nowrap flex-shrink-0">
+        Konsultasikan
+      </a>
+      <!-- Hamburger — mobile only -->
+      <button id="mobileMenuBtn"
+              class="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-[5px] rounded-lg hover:bg-slate-100 transition-colors flex-shrink-0"
+              aria-label="Buka menu">
+        <span class="block w-5 h-[2px] bg-slate-900 rounded" id="bar1"></span>
+        <span class="block w-5 h-[2px] bg-slate-900 rounded" id="bar2"></span>
+        <span class="block w-5 h-[2px] bg-slate-900 rounded" id="bar3"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile dropdown -->
+  <div id="mobileMenu" class="md:hidden border-t border-slate-100 bg-white px-4 py-0">
+    <div class="py-3 space-y-1">
+      <a class="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-bold text-slate-900 bg-slate-100 font-manrope"
+         href="../homepage_desktop/index.html">
+        <span class="material-symbols-outlined text-[18px]">home</span>
+        Home
+      </a>
+      <a class="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors font-manrope"
+         href="../guidelines_desktop/index.html">
+        <span class="material-symbols-outlined text-[18px]">menu_book</span>
+        Guidelines
+      </a>
+      <a class="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors font-manrope"
+         href="../layanan_biaya_desktop/index.html">
+        <span class="material-symbols-outlined text-[18px]">payments</span>
+        Layanan &amp; Biaya
+      </a>
+      <a class="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-colors font-manrope"
+         href="../kontak_desktop/index.html">
+        <span class="material-symbols-outlined text-[18px]">mail</span>
+        Kontak
+      </a>
+    </div>
   </div>
 </nav>
 
-<main class="max-w-7xl mx-auto px-8">
-  <section class="grid grid-cols-1 lg:grid-cols-2 gap-12 py-20 items-center">
-    <div class="space-y-6">
+<main class="max-w-7xl mx-auto px-4 md:px-8">
+
+  <!-- Hero Section -->
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 py-12 md:py-20 items-center">
+    <div class="space-y-5 reveal reveal-left">
       <div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full w-fit">
         <span class="material-symbols-outlined text-[18px]">verified</span>
         <span class="text-label-sm uppercase">Konsultan Data Terpercaya</span>
       </div>
-      <h1 class="font-headline-lg text-display-xl text-on-background leading-tight">
+      <h1 class="font-headline-lg text-[32px] md:text-[48px] leading-tight text-on-background" style="font-weight:700;letter-spacing:-0.02em;">
         Jasa Analisis dan <span class="text-secondary">Konsultasi Data</span>.
       </h1>
-      <p class="font-body-lg text-on-surface-variant max-w-xl">
+      <p class="font-body-lg text-on-surface-variant text-base md:text-lg max-w-xl">
         Statify adalah penyedia jasa analisis data, data science, dan konsultasi statistik yang membantu perusahaan dan peneliti dalam pengolahan data serta pengambilan keputusan berbasis data.
       </p>
-      <div class="flex gap-4 pt-4">
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScTGQ4U348geWzZTMVluSYOjl6X_DPiG_EQVkS_xFrVJbFqxw/viewform" class="bg-primary text-on-primary px-8 py-4 rounded-lg font-label-md hover:bg-zinc-800 transition-all flex items-center gap-2 no-underline">
+      <div class="flex flex-col sm:flex-row gap-3 pt-2">
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScTGQ4U348geWzZTMVluSYOjl6X_DPiG_EQVkS_xFrVJbFqxw/viewform" class="bg-primary text-on-primary px-6 py-3.5 rounded-lg font-label-md hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 no-underline">
           Mulai Analisis Sekarang
           <span class="material-symbols-outlined">arrow_forward</span>
         </a>
-        <a href="../guidelines_desktop/index.html" class="border border-outline px-8 py-4 rounded-lg font-label-md hover:bg-surface-container transition-all inline-block text-center no-underline leading-none">
+        <a href="../guidelines_desktop/index.html" class="border border-outline px-6 py-3.5 rounded-lg font-label-md hover:bg-surface-container transition-all inline-block text-center no-underline leading-none">
           Pelajari Metodologi
         </a>
       </div>
     </div>
 
-    <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-high shadow-xl border border-outline-variant" id="heroSliderContainer">
+    <div class="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-high shadow-xl border border-outline-variant reveal reveal-right" id="heroSliderContainer">
       <div class="slider-wrapper" id="sliderWrapper">
         <div class="slider-track" id="sliderTrack">
           <div class="slider-slide">
@@ -243,7 +399,6 @@
             <img src="../source/gambar 3.jpg" alt="Data Analytics Visualization 3" draggable="false"/>
           </div>
         </div>
-
         <button class="slider-btn slider-btn-prev" id="btnPrev" aria-label="Previous">
           <span class="material-symbols-outlined text-slate-800" style="font-size:20px">chevron_left</span>
         </button>
@@ -251,7 +406,6 @@
           <span class="material-symbols-outlined text-slate-800" style="font-size:20px">chevron_right</span>
         </button>
       </div>
-
       <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-20" id="sliderDots">
         <button class="slider-dot active" data-index="0" aria-label="Slide 1"></button>
         <button class="slider-dot" data-index="1" aria-label="Slide 2"></button>
@@ -260,49 +414,51 @@
     </div>
   </section>
 
-  <div class="h-px w-full bg-outline-variant my-12"></div>
+  <div class="h-px w-full bg-outline-variant my-8 md:my-12 reveal"></div>
 
-  <section class="py-20 space-y-16">
-    <div class="text-center space-y-4 max-w-2xl mx-auto">
-      <h2 class="font-headline-lg text-headline-lg text-on-background">Mengapa Memilih Statify?</h2>
-      <p class="text-on-surface-variant font-body-md">Kami menggabungkan ketelitian akademis dengan efisiensi industri untuk memberikan hasil yang dapat dipertanggungjawabkan.</p>
+  <!-- Why Statify Section -->
+  <section class="py-12 md:py-20 space-y-10 md:space-y-16">
+    <div class="text-center space-y-3 max-w-2xl mx-auto reveal">
+      <h2 class="font-headline-lg text-[22px] md:text-[32px] font-semibold text-on-background">Mengapa Memilih Statify?</h2>
+      <p class="text-on-surface-variant text-sm md:text-base">Kami menggabungkan ketelitian akademis dengan efisiensi industri untuk memberikan hasil yang dapat dipertanggungjawabkan.</p>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
-      <div class="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
-        <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 reveal-stagger">
+      <div class="bg-surface-container-lowest p-5 md:p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
+        <div class="w-11 h-11 bg-secondary/10 rounded-lg flex items-center justify-center mb-5 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
           <span class="material-symbols-outlined">payments</span>
         </div>
-        <h3 class="font-headline-md text-body-lg mb-3">Low Rate</h3>
+        <h3 class="font-headline-md text-body-lg mb-2">Low Rate</h3>
         <p class="text-body-sm text-on-surface-variant">Struktur biaya yang kompetitif tanpa mengorbankan kualitas analisis dan integritas data.</p>
       </div>
-      <div class="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
-        <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
+      <div class="bg-surface-container-lowest p-5 md:p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
+        <div class="w-11 h-11 bg-secondary/10 rounded-lg flex items-center justify-center mb-5 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
           <span class="material-symbols-outlined">settings_input_component</span>
         </div>
-        <h3 class="font-headline-md text-body-lg mb-3">Flexibility</h3>
+        <h3 class="font-headline-md text-body-lg mb-2">Flexibility</h3>
         <p class="text-body-sm text-on-surface-variant">Model konsultasi yang dapat disesuaikan dengan kebutuhan spesifik proyek, dari korporasi hingga riset akademis.</p>
       </div>
-      <div class="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
-        <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
+      <div class="bg-surface-container-lowest p-5 md:p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
+        <div class="w-11 h-11 bg-secondary/10 rounded-lg flex items-center justify-center mb-5 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
           <span class="material-symbols-outlined">verified_user</span>
         </div>
-        <h3 class="font-headline-md text-body-lg mb-3">Reliability</h3>
+        <h3 class="font-headline-md text-body-lg mb-2">Reliability</h3>
         <p class="text-body-sm text-on-surface-variant">Keandalan proses validasi data dengan pengawasan ketat dari pakar statistik berpengalaman.</p>
       </div>
-      <div class="bg-surface-container-lowest p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
-        <div class="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center mb-6 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
+      <div class="bg-surface-container-lowest p-5 md:p-8 border border-outline-variant rounded-xl hover:shadow-lg transition-all group">
+        <div class="w-11 h-11 bg-secondary/10 rounded-lg flex items-center justify-center mb-5 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors">
           <span class="material-symbols-outlined">handshake</span>
         </div>
-        <h3 class="font-headline-md text-body-lg mb-3">Better Collaboration</h3>
+        <h3 class="font-headline-md text-body-lg mb-2">Better Collaboration</h3>
         <p class="text-body-sm text-on-surface-variant">Alat kolaborasi yang modern memungkinkan komunikasi yang lancar antara analis dan pemangku kepentingan.</p>
       </div>
     </div>
   </section>
 
-  <section class="py-20 pb-12">
+  <!-- Consultant Section -->
+  <section class="py-12 md:py-20 pb-8 md:pb-12">
     <div class="bento-grid grid grid-cols-12 gap-6 items-center">
       
-      <div class="col-span-12 lg:col-span-6 relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-high shadow-xl border border-outline-variant" id="consultantSliderContainer">
+      <div class="col-span-12 lg:col-span-6 relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-container-high shadow-xl border border-outline-variant reveal reveal-left" id="consultantSliderContainer">
         <div class="slider-wrapper" id="consultantSliderWrapper">
           <div class="slider-track" id="consultantSliderTrack">
             <div class="slider-slide">
@@ -312,7 +468,6 @@
               <img src="../source/gambar 5.JPG" alt="Consultant Experience 2" draggable="false"/>
             </div>
           </div>
-
           <button class="slider-btn slider-btn-prev" id="cBtnPrev" aria-label="Previous">
             <span class="material-symbols-outlined text-slate-800" style="font-size:20px">chevron_left</span>
           </button>
@@ -320,20 +475,19 @@
             <span class="material-symbols-outlined text-slate-800" style="font-size:20px">chevron_right</span>
           </button>
         </div>
-
         <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex gap-2 z-20" id="consultantSliderDots">
           <button class="slider-dot active" data-index="0" aria-label="Slide 1"></button>
           <button class="slider-dot" data-index="1" aria-label="Slide 2"></button>
         </div>
       </div>
 
-      <div class="col-span-12 lg:col-span-6 bg-primary-container rounded-xl p-12 text-white flex flex-col justify-center relative overflow-hidden">
+      <div class="col-span-12 lg:col-span-6 bg-primary-container rounded-xl p-6 md:p-12 text-white flex flex-col justify-center relative overflow-hidden reveal reveal-right">
         <div class="relative z-10 space-y-6">
           <div class="inline-flex items-center gap-2 px-3 py-1 bg-secondary text-white rounded-full text-xs font-semibold tracking-wider uppercase w-fit">
             Profil Konsultan
           </div>
-          <h2 class="font-headline-lg text-3xl font-bold tracking-tight">Keahlian Akademis yang Kuat.</h2>
-          <p class="text-on-primary-container text-body-lg text-slate-300 leading-relaxed">
+          <h2 class="text-xl md:text-3xl font-bold tracking-tight font-headline-lg">Keahlian Akademis yang Kuat.</h2>
+          <p class="text-on-primary-container text-sm md:text-lg text-slate-300 leading-relaxed">
             Konsultan kami adalah mahasiswa Statistika dan Sains Data di <strong>IPB University</strong>, salah satu perguruan tinggi terbaik di Indonesia. Kami menerapkan ketajaman analitis, metode kuantitatif tingkat lanjut, dan pendekatan berbasis bukti untuk memecahkan berbagai tantangan data Anda.
           </p>
         </div>
@@ -342,59 +496,46 @@
     </div>
   </section>
 
-  <section class="py-20 border-t border-outline-variant">
-    <div class="text-center space-y-4 max-w-2xl mx-auto mb-16">
-      <h2 class="font-headline-lg text-headline-lg text-on-background">Software & Tools yang Kami Kuasai</h2>
-      <p class="text-on-surface-variant font-body-md">Kami menggunakan berbagai perangkat lunak dan bahasa pemrograman standar industri untuk memberikan analisis yang akurat dan mendalam.</p>
+  <!-- Software & Tools Section — Rolling Marquee -->
+  <section class="py-12 md:py-20 border-t border-outline-variant">
+    <div class="text-center space-y-3 max-w-2xl mx-auto mb-10 md:mb-16 reveal">
+      <h2 class="font-headline-lg text-[22px] md:text-[32px] font-semibold text-on-background">Software & Tools yang Kami Kuasai</h2>
+      <p class="text-on-surface-variant text-sm md:text-base">Kami menggunakan berbagai perangkat lunak dan bahasa pemrograman standar industri untuk memberikan analisis yang akurat dan mendalam.</p>
     </div>
-    <div class="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-6 items-center justify-items-center">
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/Rstudio.png" alt="RStudio" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">RStudio</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/python.png" alt="Python" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">Python</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/excel.png" alt="Excel" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">Excel</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/spss.png" alt="SPSS" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">SPSS</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/stata.png" alt="Stata" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">Stata</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/SAS.png" alt="SAS" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">SAS</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/my sql.png" alt="MySQL" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">MySQL</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/Power BI.png" alt="Power BI" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">Power BI</span>
-      </div>
-      <div class="flex flex-col items-center gap-3 p-4 bg-surface-container-lowest rounded-xl border border-outline-variant w-full max-w-[110px] hover:shadow-md transition-all">
-        <img src="../source/tableau.png" alt="Tableau" class="h-10 w-auto object-contain"/>
-        <span class="text-label-sm text-center text-slate-800 dark:text-slate-200">Tableau</span>
+
+    <div class="marquee-outer reveal">
+      <div class="marquee-track" id="marqueeTrack">
+        <!-- Set 1 -->
+        <div class="marquee-item"><img src="../source/Rstudio.png" alt="RStudio"/><span>RStudio</span></div>
+        <div class="marquee-item"><img src="../source/python.png" alt="Python"/><span>Python</span></div>
+        <div class="marquee-item"><img src="../source/excel.png" alt="Excel"/><span>Excel</span></div>
+        <div class="marquee-item"><img src="../source/spss.png" alt="SPSS"/><span>SPSS</span></div>
+        <div class="marquee-item"><img src="../source/stata.png" alt="Stata"/><span>Stata</span></div>
+        <div class="marquee-item"><img src="../source/SAS.png" alt="SAS"/><span>SAS</span></div>
+        <div class="marquee-item"><img src="../source/my sql.png" alt="MySQL"/><span>MySQL</span></div>
+        <div class="marquee-item"><img src="../source/Power BI.png" alt="Power BI"/><span>Power BI</span></div>
+        <div class="marquee-item"><img src="../source/tableau.png" alt="Tableau"/><span>Tableau</span></div>
+        <!-- Set 2 (duplicate for seamless loop) -->
+        <div class="marquee-item"><img src="../source/Rstudio.png" alt="RStudio"/><span>RStudio</span></div>
+        <div class="marquee-item"><img src="../source/python.png" alt="Python"/><span>Python</span></div>
+        <div class="marquee-item"><img src="../source/excel.png" alt="Excel"/><span>Excel</span></div>
+        <div class="marquee-item"><img src="../source/spss.png" alt="SPSS"/><span>SPSS</span></div>
+        <div class="marquee-item"><img src="../source/stata.png" alt="Stata"/><span>Stata</span></div>
+        <div class="marquee-item"><img src="../source/SAS.png" alt="SAS"/><span>SAS</span></div>
+        <div class="marquee-item"><img src="../source/my sql.png" alt="MySQL"/><span>MySQL</span></div>
+        <div class="marquee-item"><img src="../source/Power BI.png" alt="Power BI"/><span>Power BI</span></div>
+        <div class="marquee-item"><img src="../source/tableau.png" alt="Tableau"/><span>Tableau</span></div>
       </div>
     </div>
   </section>
 </main>
 
 <footer id="kontak" class="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 px-8 max-w-7xl mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-8 py-12 px-4 md:px-8 max-w-7xl mx-auto">
     <div class="space-y-4">
-      <img src="../source/logo.png" alt="Statify" class="h-32 w-auto object-contain"/>
+      <img src="../source/logo.png" alt="Statify" class="h-20 md:h-32 w-auto object-contain"/>
       <p class="font-manrope text-xs md:text-sm text-slate-500 dark:text-slate-400">© 2026 Statify Data Consulting. All rights reserved.</p>
     </div>
-
     <div class="flex flex-col gap-3">
       <span class="text-slate-900 dark:text-white font-bold font-manrope text-sm">Call us:</span>
       <a href="tel:+6285165693476" class="font-manrope text-xs md:text-sm text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors">
@@ -404,14 +545,12 @@
         statifyipb@gmail.com
       </a>
     </div>
-
     <div class="flex flex-col gap-3">
       <span class="text-slate-900 dark:text-white font-bold font-manrope text-sm">Find us:</span>
       <p class="font-manrope text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
         Jl. Raya Darmaga Kampus IPB, Babakan, Kec. Dramaga, Kabupaten Bogor, Jawa Barat 16680, Indonesia
       </p>
     </div>
-
     <div class="flex flex-col gap-3">
       <span class="text-slate-900 dark:text-white font-bold font-manrope text-sm">Socials</span>
       <div class="flex gap-3 items-center mt-1">
@@ -427,7 +566,72 @@
 </footer>
 
 <script>
-  // Slider 1: Hero Slider
+  /* ── Mobile Menu Toggle ── */
+  (function () {
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    const bar1 = document.getElementById('bar1');
+    const bar2 = document.getElementById('bar2');
+    const bar3 = document.getElementById('bar3');
+    let open = false;
+
+    function openMenu() {
+      open = true;
+      menu.classList.add('open');
+      bar1.style.transform = 'translateY(7px) rotate(45deg)';
+      bar2.style.opacity = '0';
+      bar3.style.transform = 'translateY(-7px) rotate(-45deg)';
+      btn.setAttribute('aria-label', 'Tutup menu');
+    }
+
+    function closeMenu() {
+      open = false;
+      menu.classList.remove('open');
+      bar1.style.transform = '';
+      bar2.style.opacity = '';
+      bar3.style.transform = '';
+      btn.setAttribute('aria-label', 'Buka menu');
+    }
+
+    btn.addEventListener('click', () => open ? closeMenu() : openMenu());
+
+    // Close when a link is tapped
+    menu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeMenu);
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (open && !btn.contains(e.target) && !menu.contains(e.target)) {
+        closeMenu();
+      }
+    });
+  })();
+
+  /* ── Scroll Reveal ── */
+  (function () {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
+      observer.observe(el);
+    });
+
+    document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('visible');
+      }
+    });
+  })();
+
+  /* ── Slider 1: Hero ── */
   (function () {
     const track = document.getElementById('sliderTrack');
     const wrapper = document.getElementById('sliderWrapper');
@@ -447,36 +651,18 @@
       track.style.transform = `translateX(-${current * 100}%)`;
       dots.forEach((d, i) => d.classList.toggle('active', i === current));
     }
-
     function next() { goTo(current + 1); }
     function prev() { goTo(current - 1); }
-
-    function startAuto() {
-      stopAuto();
-      autoTimer = setInterval(next, 5000);
-    }
-    function stopAuto() {
-      if (autoTimer) clearInterval(autoTimer);
-    }
+    function startAuto() { stopAuto(); autoTimer = setInterval(next, 5000); }
+    function stopAuto() { if (autoTimer) clearInterval(autoTimer); }
 
     btnNext.addEventListener('click', () => { next(); startAuto(); });
     btnPrev.addEventListener('click', () => { prev(); startAuto(); });
-
     dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        goTo(parseInt(dot.dataset.index));
-        startAuto();
-      });
+      dot.addEventListener('click', () => { goTo(parseInt(dot.dataset.index)); startAuto(); });
     });
 
-    // Drag / swipe support
-    wrapper.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      dragStartX = e.clientX;
-      wrapper.classList.add('dragging');
-      stopAuto();
-      e.preventDefault();
-    });
+    wrapper.addEventListener('mousedown', (e) => { isDragging = true; dragStartX = e.clientX; wrapper.classList.add('dragging'); stopAuto(); e.preventDefault(); });
     window.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
       dragDelta = e.clientX - dragStartX;
@@ -486,41 +672,25 @@
     });
     window.addEventListener('mouseup', () => {
       if (!isDragging) return;
-      isDragging = false;
-      wrapper.classList.remove('dragging');
-      track.style.transition = '';
-      if (dragDelta < -50) next();
-      else if (dragDelta > 50) prev();
-      else goTo(current);
-      dragDelta = 0;
-      startAuto();
+      isDragging = false; wrapper.classList.remove('dragging'); track.style.transition = '';
+      if (dragDelta < -50) next(); else if (dragDelta > 50) prev(); else goTo(current);
+      dragDelta = 0; startAuto();
     });
-
-    // Touch support
-    wrapper.addEventListener('touchstart', (e) => {
-      dragStartX = e.touches[0].clientX;
-      stopAuto();
-    }, { passive: true });
+    wrapper.addEventListener('touchstart', (e) => { dragStartX = e.touches[0].clientX; stopAuto(); }, { passive: true });
     wrapper.addEventListener('touchmove', (e) => {
       dragDelta = e.touches[0].clientX - dragStartX;
       const offset = -(current * 100) + (dragDelta / wrapper.offsetWidth) * 100;
-      track.style.transition = 'none';
-      track.style.transform = `translateX(${offset}%)`;
+      track.style.transition = 'none'; track.style.transform = `translateX(${offset}%)`;
     }, { passive: true });
     wrapper.addEventListener('touchend', () => {
       track.style.transition = '';
-      if (dragDelta < -50) next();
-      else if (dragDelta > 50) prev();
-      else goTo(current);
-      dragDelta = 0;
-      startAuto();
+      if (dragDelta < -50) next(); else if (dragDelta > 50) prev(); else goTo(current);
+      dragDelta = 0; startAuto();
     });
-
-    // Init
     startAuto();
   })();
 
-  // Slider 2: Consultant Slider
+  /* ── Slider 2: Consultant ── */
   (function () {
     const track = document.getElementById('consultantSliderTrack');
     const wrapper = document.getElementById('consultantSliderWrapper');
@@ -540,75 +710,41 @@
       track.style.transform = `translateX(-${current * 100}%)`;
       dots.forEach((d, i) => d.classList.toggle('active', i === current));
     }
-
     function next() { goTo(current + 1); }
     function prev() { goTo(current - 1); }
-
-    function startAuto() {
-      stopAuto();
-      autoTimer = setInterval(next, 5000);
-    }
-    function stopAuto() {
-      if (autoTimer) clearInterval(autoTimer);
-    }
+    function startAuto() { stopAuto(); autoTimer = setInterval(next, 5000); }
+    function stopAuto() { if (autoTimer) clearInterval(autoTimer); }
 
     btnNext.addEventListener('click', () => { next(); startAuto(); });
     btnPrev.addEventListener('click', () => { prev(); startAuto(); });
-
     dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        goTo(parseInt(dot.dataset.index));
-        startAuto();
-      });
+      dot.addEventListener('click', () => { goTo(parseInt(dot.dataset.index)); startAuto(); });
     });
 
-    // Drag / swipe support for slider 2
-    wrapper.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      dragStartX = e.clientX;
-      wrapper.classList.add('dragging');
-      stopAuto();
-      e.preventDefault();
-    });
+    wrapper.addEventListener('mousedown', (e) => { isDragging = true; dragStartX = e.clientX; wrapper.classList.add('dragging'); stopAuto(); e.preventDefault(); });
     window.addEventListener('mousemove', (e) => {
       if (!isDragging) return;
       dragDelta = e.clientX - dragStartX;
       const offset = -(current * 100) + (dragDelta / wrapper.offsetWidth) * 100;
-      track.style.transition = 'none';
-      track.style.transform = `translateX(${offset}%)`;
+      track.style.transition = 'none'; track.style.transform = `translateX(${offset}%)`;
     });
     window.addEventListener('mouseup', () => {
       if (!isDragging) return;
-      isDragging = false;
-      wrapper.classList.remove('dragging');
-      track.style.transition = '';
-      if (dragDelta < -50) next();
-      else if (dragDelta > 50) prev();
-      else goTo(current);
-      dragDelta = 0;
-      startAuto();
+      isDragging = false; wrapper.classList.remove('dragging'); track.style.transition = '';
+      if (dragDelta < -50) next(); else if (dragDelta > 50) prev(); else goTo(current);
+      dragDelta = 0; startAuto();
     });
-
-    // Touch support for slider 2
-    wrapper.addEventListener('touchstart', (e) => {
-      dragStartX = e.touches[0].clientX;
-      stopAuto();
-    }, { passive: true });
+    wrapper.addEventListener('touchstart', (e) => { dragStartX = e.touches[0].clientX; stopAuto(); }, { passive: true });
     wrapper.addEventListener('touchmove', (e) => {
       dragDelta = e.touches[0].clientX - dragStartX;
       const offset = -(current * 100) + (dragDelta / wrapper.offsetWidth) * 100;
-      track.style.transition = 'none';
-      track.style.transform = `translateX(${offset}%)`;
+      track.style.transition = 'none'; track.style.transform = `translateX(${offset}%)`;
     }, { passive: true });
     wrapper.addEventListener('touchend', () => {
       track.style.transition = '';
-      if (dragDelta < -50) next();
-      else if (dragDelta > 50) prev();
-      else goTo(current);
-      dragDelta = 0;
-      startAuto();
+      if (dragDelta < -50) next(); else if (dragDelta > 50) prev(); else goTo(current);
+      dragDelta = 0; startAuto();
     });
-
     startAuto();
   })();
 </script>
